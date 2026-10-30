@@ -1,9 +1,3 @@
-"""Fan-out worker. Consumes the `fanout` stream and writes follower feeds.
-
-Several workers can run at once; each joins the `workers` consumer group under
-its own name.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -27,8 +21,6 @@ from backend.store import Post, ensure_group, following_of, make_strategy, parse
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("feedline.worker")
 
-# Backlog is XLEN: delivered messages are XDEL'd, so whatever remains is
-# accepted but not yet delivered (queued or in flight on some worker).
 STATS_LUA = """
 local posts = tonumber(ARGV[2])
 local writes = tonumber(ARGV[3])
@@ -56,8 +48,6 @@ return lag
 
 
 class Listeners:
-    """Which connected readers follow each author, refreshed every couple of seconds."""
-
     def __init__(self, conn, client, every: float = 2.0):
         self.conn = conn
         self.client = client
@@ -108,7 +98,6 @@ def process_batch(conn, client, stats, name: str, listeners: Listeners, messages
 
 
 def claim_stale(conn, client, stats, name: str, listeners: Listeners) -> None:
-    """Take over messages another worker read but never acknowledged."""
     start = "0-0"
     while True:
         next_id, messages, *_ = client.xautoclaim(
@@ -138,7 +127,6 @@ def main() -> None:
         try:
             step(conn, client, stats, name, listeners, clock)
         except (redis.ConnectionError, redis.TimeoutError) as exc:
-            # Unacknowledged messages stay pending and are reclaimed after 30 s.
             log.warning("%s lost redis (%s); retrying", name, exc)
             time.sleep(2)
 

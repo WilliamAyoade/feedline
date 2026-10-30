@@ -7,7 +7,7 @@ from backend.store import (
     PushStrategy,
     insert_post,
     pull_read,
-    spec_join_read,
+    join_read,
 )
 from tests.conftest import HIGH, cleanup
 
@@ -47,7 +47,7 @@ def test_hybrid_does_not_fanout_celebrities(conn, rdb):
         cleanup(conn, rdb, [reader, normal, celeb])
 
 
-def test_lateral_matches_spec_join(conn, rdb):
+def test_lateral_matches_join(conn, rdb):
     reader, author = HIGH + 21, HIGH + 22
     try:
         conn.execute(
@@ -65,12 +65,12 @@ def test_lateral_matches_spec_join(conn, rdb):
         insert_post(conn, author, "tie-a", same)
         insert_post(conn, author, "tie-b", same)
         assert [post.id for post in pull_read(conn, reader, 4, None)] == [
-            post.id for post in spec_join_read(conn, reader, 4, None)
+            post.id for post in join_read(conn, reader, 4, None)
         ]
         page = pull_read(conn, reader, 2, None)
         bound = (page[-1].created_at, page[-1].id)
         assert [post.id for post in pull_read(conn, reader, 10, bound)] == [
-            post.id for post in spec_join_read(conn, reader, 10, bound)
+            post.id for post in join_read(conn, reader, 10, bound)
         ]
     finally:
         cleanup(conn, rdb, [reader, author])

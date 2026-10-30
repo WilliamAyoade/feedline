@@ -1,5 +1,3 @@
-"""Compare each strategy's feed with the pull query for 1,000 sampled users."""
-
 from __future__ import annotations
 
 import argparse

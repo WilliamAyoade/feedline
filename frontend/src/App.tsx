@@ -256,9 +256,8 @@ export function App() {
         <h1>feedline</h1>
         <p className="thesis">
           This is a follow feed, like the home timeline on Twitter or Instagram: you see posts from
-          people you follow, newest first. The hard part is a celebrity post — here, one account has{" "}
-          {maxFollowers.toLocaleString()} followers, and each of them should see the post without
-          waiting.
+          people you follow. The hard part is a celebrity post — here, one account has{" "}
+          {maxFollowers.toLocaleString()} followers, and each of them should see the post with minimum wait time.
         </p>
         <dl className="stats">
           <div>

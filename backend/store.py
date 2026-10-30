@@ -1,9 +1,3 @@
-"""Push, pull, and hybrid feed strategies.
-
-`post` writes a post into follower feeds. `read` returns one reader's feed,
-newest first. The pull query is the ground truth the other strategies must match.
-"""
-
 from __future__ import annotations
 
 import heapq
@@ -18,7 +12,6 @@ from backend.config import BATCH, GROUP, KEEP, SCHEMA_PATH, STREAM, hybrid_thres
 
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
-# One round trip updates this many follower feeds, then trims each to KEEP.
 FANOUT_LUA = """
 local keep = tonumber(ARGV[1])
 local score = tonumber(ARGV[2])
@@ -37,7 +30,6 @@ _scripts: dict[int, Any] = {}
 
 
 def epoch_us(dt: datetime) -> int:
-    """Microseconds since the Unix epoch, exact for timezone-aware datetimes."""
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     else:
@@ -76,7 +68,6 @@ def is_older(post: Post, before: tuple[datetime, int]) -> bool:
 
 
 def kway_merge(lists: Sequence[Sequence[Post]], limit: int) -> list[Post]:
-    """Merge newest-first lists into the `limit` newest posts. Ties break on higher id."""
     heap: list[tuple[int, int, int, int]] = []
     for li, posts in enumerate(lists):
         if not posts:
@@ -126,7 +117,6 @@ def _script(redis):
 
 
 def fanout_feeds(redis, followers: list[int], post: Post) -> int:
-    """Copy one post into each follower's sorted set, in batches of 1,000, trimmed to 800."""
     if not followers:
         return 0
     script = _script(redis)
@@ -207,7 +197,6 @@ def posts_from_feed(conn, redis, user: int, limit: int, before: tuple[datetime, 
 
 
 def pull_read(conn, user: int, limit: int, before: tuple[datetime, int] | None) -> list[Post]:
-    """Newest posts across followees. Lateral index scans, same rows as the plain join."""
     if before is None:
         sql = """
             SELECT p.id, p.author, p.created_at, p.text
@@ -246,8 +235,7 @@ def pull_read(conn, user: int, limit: int, before: tuple[datetime, int] | None) 
         return [Post(int(row[0]), int(row[1]), row[2], row[3]) for row in cur.fetchall()]
 
 
-def spec_join_read(conn, user: int, limit: int, before: tuple[datetime, int] | None) -> list[Post]:
-    """The pull query from the spec, plus id as a stable tie break."""
+def join_read(conn, user: int, limit: int, before: tuple[datetime, int] | None) -> list[Post]:
     if before is None:
         sql = """
             SELECT p.id, p.author, p.created_at, p.text
@@ -345,7 +333,6 @@ class FeedStrategy(ABC):
 
     @abstractmethod
     def post(self, conn, redis, post: Post, follower_count: int) -> int:
-        """Write the post into follower feeds. Returns the number of feed writes."""
         raise NotImplementedError
 
     @abstractmethod
@@ -479,7 +466,6 @@ def followers_among(conn, author: int, listeners: list[int]) -> list[int]:
 
 
 def following_of(conn, listeners: list[int]) -> dict[int, list[int]]:
-    """Map each followee to the listeners who follow it."""
     out: dict[int, list[int]] = {}
     if not listeners:
         return out
@@ -498,7 +484,6 @@ def workers_busy(redis) -> bool:
 
 
 def queue_live(pipe, targets: list[int], post: Post, accepted_at: datetime) -> None:
-    """Add PUBLISH and catch-up list writes for `targets` to a pipeline."""
     delivered = datetime.now(timezone.utc)
     payload = json.dumps(
         {

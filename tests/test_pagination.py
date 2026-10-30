@@ -69,11 +69,8 @@ def test_push_cursor_pagination_and_timestamp_ties(conn, rdb):
         got = _collect(PushStrategy(), conn, rdb, follower, 2)
         assert len(got) == len(set(got)) == len(expected)
         assert set(got) == set(expected)
-        posts = {post_id: None for post_id in expected}
-        # Newest first: three ties (higher id first) then the four distinct seconds descending.
-        ordered = list(reversed(expected[:4])) 
+        ordered = list(reversed(expected[:4]))
         tie_ids = sorted(expected[4:], reverse=True)
-        # The three ties share the newest timestamp, so they come first.
         assert got == tie_ids + ordered
     finally:
         cleanup(conn, rdb, [follower, author])

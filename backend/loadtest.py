@@ -1,5 +1,3 @@
-"""Concurrent feed readers and SSE clients. Runs while replay.py is posting."""
-
 from __future__ import annotations
 
 import argparse

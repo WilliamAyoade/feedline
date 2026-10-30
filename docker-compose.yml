@@ -1,13 +1,5 @@
-# Postgres is published on host port 5433 because Postgres.app already
-# listens on 5432. Inside the container it is still PostgreSQL 16 on 5432.
-# Redis does not persist to disk: feeds are rebuilt by replay.
-#
-# Memory budget (Colima VM is 5 GB):
-#   Redis    2.8 GB container, 2.5 GB maxmemory, noeviction
-#   Postgres 1.4 GB container
-#   VM OS / Docker leftover ~0.8 GB
-# Push's estimated feed set is 0.8–2.8 GB; Redis will error instead of evict
-# if a strategy exceeds 2.5 GB. That is a measured result, not a silent drop.
+# 5433: host 5432 is already taken. Redis is ephemeral; replay rebuilds feeds.
+# Caps fit a 5 GB Colima VM (Redis 2.8/2.5 GB noeviction, Postgres 1.4 GB).
 services:
   postgres:
     image: postgres:16

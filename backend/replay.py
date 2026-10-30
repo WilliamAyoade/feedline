@@ -1,5 +1,3 @@
-"""Replay activity rows through POST /posts, compressed in time by --speed."""
-
 from __future__ import annotations
 
 import argparse

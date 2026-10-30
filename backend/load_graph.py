@@ -1,5 +1,3 @@
-"""Load the follower graph. Column 1 follows column 2 unless the heavy tail says otherwise."""
-
 from __future__ import annotations
 
 import gzip

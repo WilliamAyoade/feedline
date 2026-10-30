@@ -1,5 +1,3 @@
-"""Reset posts and Redis feeds between strategy runs."""
-
 from __future__ import annotations
 
 import time
@@ -21,7 +19,6 @@ def _delete_match(redis, pattern: str) -> int:
 
 
 def reset_storage(conn, redis, strategy: str, threshold: int) -> None:
-    """Pause the worker, drop posts and feed keys, then publish the strategy to run."""
     redis.set("config:paused", "1")
     deadline = time.time() + 120
     while time.time() < deadline:

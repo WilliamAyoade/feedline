@@ -1,5 +1,3 @@
-"""HTTP API: posts, feeds, follow, and a per-user SSE stream."""
-
 from __future__ import annotations
 
 import asyncio

@@ -1,5 +1,3 @@
-"""Drop posts and Redis feeds, then select the strategy for the next run."""
-
 from __future__ import annotations
 
 import argparse

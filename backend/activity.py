@@ -1,5 +1,3 @@
-"""Read the Higgs activity file and locate its busiest 10 minutes."""
-
 from __future__ import annotations
 
 import gzip
@@ -67,7 +65,6 @@ def load_events(path: Path) -> list[Event]:
 
 
 def busiest_window(events: list[Event], seconds: int = 600) -> tuple[int, int, int]:
-    """Return (start_ts, end_ts, count) for the busiest window of `seconds`."""
     if not events:
         return (0, 0, 0)
     stamps = [event.ts for event in events]
@@ -87,7 +84,6 @@ def busiest_window(events: list[Event], seconds: int = 600) -> tuple[int, int, i
 
 
 def synthetic_events(conn, n: int = 20000, seed: int = 1) -> list[Event]:
-    """Posts with authors drawn proportional to follower count. Used only if Higgs activity is missing."""
     random.seed(seed)
     with conn.cursor() as cur:
         cur.execute("SELECT id, follower_count FROM users WHERE follower_count > 0")
