@@ -84,7 +84,7 @@ Timed comparison at speed 60. Full table and notes: [RESULTS.md](RESULTS.md).
 | hybrid 10K | 30,548,796 | 54.25 | 475 | 9,891 | 351 / 0.77 s | 9.0/32.8/337 | 33.5 | 98.2 | 11.3/152 | 52.0 | 1000/1000 |
 | hybrid 100K | 37,759,074 | 67.06 | 580 | 45,221 | 230 / 1.84 s | 7.5/24.6/112 | 25.3 | 99.1 | 23.8/658 | 313 | 1000/1000 |
 
-## Interview notes
+## Design notes
 
 Hybrid is the attempt to keep push’s fast read without paying push’s write on celebrity posts. A push feed is a Redis sorted set per user, trimmed to the newest 800 posts. A pull feed is a Postgres index scan over the accounts you follow. Hybrid copies a post into follower feeds only when the author has fewer followers than a threshold T. At read time it merges that Redis feed with the newest posts from the celebrities you follow.
 
@@ -96,4 +96,4 @@ The feed is newest-first because the question being measured is delivery, not ra
 
 SSE is enough because the server only needs to tell a connected reader that new posts exist. The browser reconnects with `Last-Event-ID`, and the server replays anything that arrived during the gap. WebSockets would add a second direction this UI does not use.
 
-On call, the two signals that mean the feed is late are the fan-out stream lag (posts accepted but not copied yet) and the 99th percentile feed-read time. Lag climbing during a celebrity post means the worker is behind. Read time climbing on pull or hybrid means the celebrity merge or the index scan is the bottleneck.
+The two signals that mean the feed is late are the fan-out stream lag (posts accepted but not copied yet) and the 99th percentile feed-read time. Lag climbing during a celebrity post means the worker is behind. Read time climbing on pull or hybrid means the celebrity merge or the index scan is the bottleneck.
