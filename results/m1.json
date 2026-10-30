@@ -1,0 +1,41 @@
+{
+  "users": 456626,
+  "follows": 14855819,
+  "self_follows_dropped": 23,
+  "duplicate_edges_dropped": 0,
+  "direction": "column 1 follows column 2",
+  "max_followers": 51386,
+  "p99_followers": 418,
+  "top5": [
+    {
+      "id": 1503,
+      "followers": 51386
+    },
+    {
+      "id": 206,
+      "followers": 48414
+    },
+    {
+      "id": 88,
+      "followers": 45221
+    },
+    {
+      "id": 138,
+      "followers": 44188
+    },
+    {
+      "id": 1062,
+      "followers": 40120
+    }
+  ],
+  "activity_rows": 563069,
+  "busy_start": 1341381065,
+  "busy_end": 1341381665,
+  "busy_posts": 8977,
+  "announcement_posts": 44926,
+  "estimated_push_writes": 37759074,
+  "estimated_worst_post": 45221,
+  "estimated_worst_author": 88,
+  "edge_file": "higgs-social_network.edgelist.gz",
+  "seconds": 60.3
+}

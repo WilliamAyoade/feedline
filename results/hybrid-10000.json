@@ -1,0 +1,47 @@
+{
+  "strategy": "hybrid",
+  "threshold": 10000,
+  "label": "hybrid-10000",
+  "speed": 60.0,
+  "posts": 563069,
+  "errors": 0,
+  "schedule_lag_s": 0.028,
+  "feed_writes": 30548796,
+  "write_amp": 54.2541,
+  "redis_mb": 475.4,
+  "worst_post": 9891,
+  "backlog_peak": 351,
+  "drain_s": 0.772,
+  "read": {
+    "p50": 9.0,
+    "p95": 32.81,
+    "p99": 337.31,
+    "count": 983749
+  },
+  "celeb_read": {
+    "p50": 9.51,
+    "p95": 33.49,
+    "p99": 338.25,
+    "count": 491705
+  },
+  "fresh": {
+    "p50": 11.33,
+    "p99": 151.62,
+    "count": 25767
+  },
+  "fresh_busy": {
+    "p99": 51.95,
+    "count": 925
+  },
+  "req_per_s": 98.21,
+  "read_errors": 2,
+  "readers": 200,
+  "warmup_s": 60,
+  "busy_start": 1341381065.0,
+  "busy_end": 1341381665.0,
+  "busy_posts": 8977,
+  "match": "1000/1000",
+  "finished_at": "2026-10-29T19:09:27-07:00",
+  "match_ok": 1000,
+  "match_n": 1000
+}

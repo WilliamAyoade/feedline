@@ -1,0 +1,67 @@
+heavy reader 13115
+
+## lateral pull
+Limit  (cost=85437.53..85437.65 rows=50 width=33) (actual time=58.472..58.477 rows=50 loops=1)
+  Buffers: shared hit=10688 read=24
+  ->  Sort  (cost=85437.53..85482.10 rows=17828 width=33) (actual time=58.471..58.473 rows=50 loops=1)
+        Sort Key: posts.created_at DESC, posts.id DESC
+        Sort Method: top-N heapsort  Memory: 31kB
+        Buffers: shared hit=10688 read=24
+        ->  Nested Loop  (cost=20.76..84845.30 rows=17828 width=33) (actual time=1.573..57.265 rows=6079 loops=1)
+              Buffers: shared hit=10685 read=24
+              ->  Index Only Scan using follows_pkey on follows f  (cost=0.56..154.56 rows=4457 width=8) (actual time=1.023..2.016 rows=1259 loops=1)
+                    Index Cond: (follower = '13115'::smallint)
+                    Heap Fetches: 0
+                    Buffers: shared hit=25 read=6
+              ->  Memoize  (cost=20.20..20.21 rows=4 width=33) (actual time=0.042..0.043 rows=5 loops=1259)
+                    Cache Key: f.followee
+                    Cache Mode: binary
+                    Hits: 0  Misses: 1259  Evictions: 0  Overflows: 0  Memory Usage: 477kB
+                    Buffers: shared hit=10660 read=18
+                    ->  Limit  (cost=20.19..20.20 rows=4 width=33) (actual time=0.041..0.042 rows=5 loops=1259)
+                          Buffers: shared hit=10660 read=18
+                          ->  Sort  (cost=20.19..20.20 rows=4 width=33) (actual time=0.041..0.041 rows=5 loops=1259)
+                                Sort Key: posts.created_at DESC, posts.id DESC
+                                Sort Method: quicksort  Memory: 25kB
+                                Buffers: shared hit=10660 read=18
+                                ->  Bitmap Heap Scan on posts  (cost=4.46..20.15 rows=4 width=33) (actual time=0.012..0.039 rows=6 loops=1259)
+                                      Recheck Cond: (author = f.followee)
+                                      Heap Blocks: exact=6887
+                                      Buffers: shared hit=10660 read=18
+                                      ->  Bitmap Index Scan on posts_author_created_idx  (cost=0.00..4.46 rows=4 width=0) (actual time=0.008..0.008 rows=6 loops=1259)
+                                            Index Cond: (author = f.followee)
+                                            Buffers: shared hit=3773 read=18
+Planning:
+  Buffers: shared hit=67
+Planning Time: 1.749 ms
+Execution Time: 58.777 ms
+
+## spec join
+Limit  (cost=9108.37..9114.20 rows=50 width=33) (actual time=54.820..57.171 rows=50 loops=1)
+  Buffers: shared hit=4850 read=8 dirtied=4
+  ->  Gather Merge  (cost=9108.37..11089.98 rows=16984 width=33) (actual time=54.818..57.167 rows=50 loops=1)
+        Workers Planned: 2
+        Workers Launched: 2
+        Buffers: shared hit=4850 read=8 dirtied=4
+        ->  Sort  (cost=8108.35..8129.58 rows=8492 width=33) (actual time=37.444..37.446 rows=39 loops=3)
+              Sort Key: p.created_at DESC, p.id DESC
+              Sort Method: top-N heapsort  Memory: 31kB
+              Buffers: shared hit=4850 read=8 dirtied=4
+              Worker 0:  Sort Method: top-N heapsort  Memory: 32kB
+              Worker 1:  Sort Method: top-N heapsort  Memory: 32kB
+              ->  Hash Join  (cost=210.27..7826.25 rows=8492 width=33) (actual time=0.712..36.671 rows=2406 loops=3)
+                    Hash Cond: (p.author = f.followee)
+                    Buffers: shared hit=4820 read=8 dirtied=4
+                    ->  Parallel Seq Scan on posts p  (cost=0.00..6997.19 rows=235719 width=33) (actual time=0.017..20.648 rows=187690 loops=3)
+                          Buffers: shared hit=4632 read=8 dirtied=4
+                    ->  Hash  (cost=154.56..154.56 rows=4457 width=8) (actual time=0.360..0.361 rows=1259 loops=3)
+                          Buckets: 8192  Batches: 1  Memory Usage: 114kB
+                          Buffers: shared hit=92
+                          ->  Index Only Scan using follows_pkey on follows f  (cost=0.56..154.56 rows=4457 width=8) (actual time=0.186..0.276 rows=1259 loops=3)
+                                Index Cond: (follower = '13115'::smallint)
+                                Heap Fetches: 0
+                                Buffers: shared hit=92
+Planning:
+  Buffers: shared hit=35
+Planning Time: 0.333 ms
+Execution Time: 57.206 ms

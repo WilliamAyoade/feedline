@@ -1,0 +1,47 @@
+{
+  "strategy": "pull",
+  "threshold": null,
+  "label": "pull",
+  "speed": 60.0,
+  "posts": 563069,
+  "errors": 2,
+  "schedule_lag_s": 0.124,
+  "feed_writes": 0,
+  "write_amp": 0.0,
+  "redis_mb": 5.5,
+  "worst_post": 0,
+  "backlog_peak": 99,
+  "drain_s": 0.043,
+  "read": {
+    "p50": 4.73,
+    "p95": 29.68,
+    "p99": 98.25,
+    "count": 995755
+  },
+  "celeb_read": {
+    "p50": 4.75,
+    "p95": 29.75,
+    "p99": 97.98,
+    "count": 497879
+  },
+  "fresh": {
+    "p50": 3.43,
+    "p99": 17.3,
+    "count": 27817
+  },
+  "fresh_busy": {
+    "p99": 5.22,
+    "count": 878
+  },
+  "req_per_s": 99.41,
+  "read_errors": 0,
+  "readers": 200,
+  "warmup_s": 60,
+  "busy_start": 1341381065.0,
+  "busy_end": 1341381665.0,
+  "busy_posts": 8977,
+  "match": "1000/1000",
+  "finished_at": "2026-10-29T10:55:03-07:00",
+  "match_ok": 1000,
+  "match_n": 1000
+}

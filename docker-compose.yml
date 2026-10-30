@@ -1,0 +1,72 @@
+# Postgres is published on host port 5433 because Postgres.app already
+# listens on 5432. Inside the container it is still PostgreSQL 16 on 5432.
+# Redis does not persist to disk: feeds are rebuilt by replay.
+#
+# Memory budget (Colima VM is 5 GB):
+#   Redis    2.8 GB container, 2.5 GB maxmemory, noeviction
+#   Postgres 1.4 GB container
+#   VM OS / Docker leftover ~0.8 GB
+# Push's estimated feed set is 0.8–2.8 GB; Redis will error instead of evict
+# if a strategy exceeds 2.5 GB. That is a measured result, not a silent drop.
+services:
+  postgres:
+    image: postgres:16
+    mem_limit: 1400m
+    memswap_limit: 1400m
+    environment:
+      POSTGRES_USER: feedline
+      POSTGRES_PASSWORD: feedline
+      POSTGRES_DB: feedline
+    ports:
+      - "5433:5432"
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=256MB
+      - -c
+      - synchronous_commit=off
+      - -c
+      - checkpoint_timeout=30min
+      - -c
+      - max_wal_size=1GB
+      - -c
+      - max_connections=50
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U feedline -d feedline"]
+      interval: 2s
+      timeout: 5s
+      retries: 40
+    shm_size: 256mb
+  redis:
+    image: redis:7
+    mem_limit: 2800m
+    memswap_limit: 2800m
+    ports:
+      - "6379:6379"
+    command:
+      - redis-server
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+      - --maxmemory
+      - 2500mb
+      - --maxmemory-policy
+      - noeviction
+      - --zset-max-listpack-entries
+      - "1024"
+      - --zset-max-listpack-value
+      - "64"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 40
+volumes:
+  pgdata:
